@@ -13,10 +13,21 @@ const typeDefinitions = /* GraphQL */ `
   type Query {
     info: String!
     users: [User!]!
+    allShortcuts: [Shortcut!]!
   }
 
   type Mutation {
-    userAuth(name: String!, email: String!, Org_name: String!, password: String!, id: ID!): User!
+    createUser(name: String!, email: String!, Org_name: String!, password: String!, id: ID!): User!
+  }
+
+  type Mutation {
+    createShortcut(user_id: ID!, snippet: String!, url: String!): Shortcut!
+  }
+
+  type Shortcut {
+    user_id: ID!
+    snippet: String!
+    url: String!
   }
 
   type User {
@@ -26,7 +37,6 @@ const typeDefinitions = /* GraphQL */ `
     Org_name: String!
     password: String!
   }
- 
 `
 // const links: Link[] = [
 //     {
@@ -41,18 +51,20 @@ const resolvers = {
       info: () => 'This is the API of a Hackernews clone',
       users: async () => {
         const [results] = await Promise.all([conn.execute('select * from users')]);
-        const json = JSON.stringify(results.rows);
-        return JSON.parse(json);
+        return results.rows;
+      },
+      allShortcuts: async () => {
+        const [results] = await Promise.all([conn.execute('select * from shortcuts')]);
+        return results.rows;
       }
     },
     Mutation: {
-        userAuth: async (parent: unknown, args: { name: string; email: string, Org_name: string, password: string, id: number }) => {
+        createUser: async (parent: unknown, args: { name: string; email: string, Org_name: string, password: string, id: number }) => {
           const user = {
             id: args.id,
             name: args.name,
             email: args.email,
-            Org_name: args.Org_name,
-            password: args.password
+            Org_name: args.Org_name
         }
 
           const query = 'INSERT INTO users (`id`, `name`, `email`, `password`, `OrgName`) VALUES (?, ?, ?, ?, ?)'
@@ -60,6 +72,19 @@ const resolvers = {
           await conn.execute(query, params)
      
           return user
+        },
+        createShortcut: async(parent: unknown, args: {user_id: number, snippet: string, url: string}) => {
+            const shortcut = {
+                user_id: args.user_id,
+                snippet: args.snippet,
+                url: args.url
+            }
+
+            const query = 'INSERT INTO shortcuts (`user_id`, `snippet`, `url`) VALUES (?, ?, ?)'
+            const params = [args.user_id, args.snippet, args.url];
+            await conn.execute(query, params);
+
+            return shortcut
         }
       }
 }
