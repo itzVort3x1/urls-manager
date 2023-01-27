@@ -3,6 +3,7 @@ import { createYoga, createSchema } from 'graphql-yoga'
 import { schema } from './schema'
 
 const yoga = createYoga({
+	graphqlEndpoint: '/',
 	schema: schema
 })
 
