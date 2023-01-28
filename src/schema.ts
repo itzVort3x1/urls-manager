@@ -13,6 +13,10 @@ const conn = connect(config);
 const resolvers = {
     Query: {
       info: () => 'This is the API of a Hackernews clone',
+      totalUsers: async () => {
+        const [results] = await Promise.all([conn.execute('select count(*) as total from users')]);
+        return parseInt(results.rows[0].total);
+      },
       users: async () => {
         const [results] = await Promise.all([conn.execute('select * from users')]);
         return results.rows;
@@ -22,7 +26,7 @@ const resolvers = {
         return results.rows;
       },
       getUser: async (parent, args) => {
-        const [results] = await Promise.all([conn.execute(`select * from users where email = "${args.email}"`)]);
+        const [results] = await Promise.all([conn.execute(`select * from users where email = "${args.email}" or id = ${args.id}`)]);
         return results.rows;
       }
     },
@@ -35,7 +39,7 @@ const resolvers = {
             Org_name: args.Org_name
         }
 
-          const query = 'INSERT INTO users (`id`, `name`, `email`, `password`, `OrgName`) VALUES (?, ?, ?, ?, ?)'
+          const query = 'INSERT INTO users (`id`, `name`, `email`, `password`, `Org_name`) VALUES (?, ?, ?, ?, ?)'
           const params = [args.id, args.name, args.email, args.password, args.Org_name]
           await conn.execute(query, params)
     

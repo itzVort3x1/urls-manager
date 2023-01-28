@@ -2,8 +2,9 @@ export const typeDefinitions = `
   type Query {
     info: String!
     users: [User!]!
-    getUser(email: String!): [User!]
+    getUser(email: String, id: ID): [User!]
     allShortcuts: [Shortcut!]!
+    totalUsers: Int
   }
 
   type Mutation {
