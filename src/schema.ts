@@ -1,5 +1,6 @@
 import { makeExecutableSchema } from '@graphql-tools/schema'
 import { connect } from '@planetscale/database'
+import { typeDefinitions } from './types/typeDefinitions.ts'
 
 const config = {
     host: 'us-east.connect.psdb.cloud',
@@ -8,43 +9,6 @@ const config = {
 }
 
 const conn = connect(config);
-
-const typeDefinitions = /* GraphQL */ `
-  type Query {
-    info: String!
-    users: [User!]!
-    allShortcuts: [Shortcut!]!
-  }
-
-  type Mutation {
-    createUser(name: String!, email: String!, Org_name: String!, password: String!, id: ID!): User!
-  }
-
-  type Mutation {
-    createShortcut(user_id: ID!, snippet: String!, url: String!): Shortcut!
-  }
-
-  type Shortcut {
-    user_id: ID!
-    snippet: String!
-    url: String!
-  }
-
-  type User {
-    id: ID!
-    name: String!
-    email: String!
-    Org_name: String!
-    password: String!
-  }
-`
-// const links: Link[] = [
-//     {
-//       id: 'link-0',
-//       url: 'https://graphql-yoga.com',
-//       description: 'The easiest way of setting up a GraphQL server'
-//     }
-//   ]
 
 const resolvers = {
     Query: {
@@ -55,6 +19,10 @@ const resolvers = {
       },
       allShortcuts: async () => {
         const [results] = await Promise.all([conn.execute('select * from shortcuts')]);
+        return results.rows;
+      },
+      getUser: async (parent, args) => {
+        const [results] = await Promise.all([conn.execute(`select * from users where email = "${args.email}"`)]);
         return results.rows;
       }
     },
@@ -70,7 +38,7 @@ const resolvers = {
           const query = 'INSERT INTO users (`id`, `name`, `email`, `password`, `OrgName`) VALUES (?, ?, ?, ?, ?)'
           const params = [args.id, args.name, args.email, args.password, args.Org_name]
           await conn.execute(query, params)
-     
+    
           return user
         },
         createShortcut: async(parent: unknown, args: {user_id: number, snippet: string, url: string}) => {

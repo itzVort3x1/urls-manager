@@ -1,0 +1,32 @@
+#center-div {
+     top: 50%;
+     left: 50%;
+     transform: translate(-50%, -50%);
+}
+input[type="password"]{
+     width: 25rem;
+     height: 3rem;
+     padding-right: 5rem;
+     background: white;
+}
+input[type="text"]{
+     width: 25rem;
+     height: 3rem;
+     padding-right: 5rem;
+     background: white;
+}
+input[type="email"]{
+     width: 25rem;
+     height: 3rem;
+     padding-right: 5rem;
+     background: white;
+}
+input[type="submit"]{
+     margin-left: -85px;
+     height: 2.5rem;
+     width: 5rem;
+     border: 0;
+     background: #F55050;
+     cursor: pointer;
+     -webkit-appearance: none;
+}

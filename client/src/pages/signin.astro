@@ -1,0 +1,34 @@
+---
+import '../styles/global.css';
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Astro</title>
+	</head>
+	<body>
+		<div class="w-screen h-screen bg-gray-300 relative">
+			<div id="center-div" class="absolute text-center">
+				<h1 class="text-xl py-3" >Sign Up to Urls</h1>
+                    <input autocomplete="off" type="text" value="" id="name-input" class="p-3 my-2 rounded bg-transparent  border-b-1 border-black focus:outline-none" placeholder="Name"/>
+                    <br>
+				<input autocomplete="off" type="email" value="" id="email-input" class="p-3 my-2 rounded bg-transparent  border-b-1 border-black focus:outline-none" placeholder="Email"/>
+                    <input autocomplete="off" type="text" value="" id="org-input" class="p-3 my-2 rounded bg-transparent  border-b-1 border-black focus:outline-none" placeholder="Organization Name"/>
+                    <input autocomplete="off" type="password" value="" id="pass-input" class="p-3 my-2 rounded bg-transparent  border-b-1 border-black focus:outline-none" placeholder="Password"/>
+                    <input autocomplete="off" type="password" value="" id="cpass-input" class="p-3 my-2 rounded bg-transparent  border-b-1 border-black focus:outline-none" placeholder="Confirm Password"/>
+                    <br>
+                    <button class="bg-rose-600 py-2 px-4 my-2 rounded">Sign Up</button>
+				<br>
+				<span id="error-text" class="hidden">Invalid Email</span>
+                    <h1 class="py-3">Have an account? <a href="/" class="text-blue-500">Log In</a></h1>
+			</div>
+		</div>
+	</body>
+</html>
+<script>
+	import "../scripts/script.js";
+</script>
