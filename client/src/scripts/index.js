@@ -1,4 +1,5 @@
 const emailInput = document.getElementById('email-input');
+const passInput = document.getElementById('pass-input');
 const errorText = document.getElementById('error-text');
 const loginBtn = document.getElementById('login-btn');
 
@@ -37,14 +38,15 @@ document.getElementById('login-btn').addEventListener('click', async () => {
 
 	var graphql = JSON.stringify({
 		query: `
-		query getUser($email: String!){
-			getUser(email: $email){
+		query loginUser($email: String!, $pass: String!){
+			loginUser(email: $email, password:	$pass){
 			  id
 			}
-		}
+		   }
 		`,
 		variables: {
-			email: emailInput.value
+			email: emailInput.value,
+			pass: passInput.value
 		}
 	});
 
@@ -59,12 +61,11 @@ document.getElementById('login-btn').addEventListener('click', async () => {
 		.then(res => res.text())
 		.then(result => {
 			const { data } = JSON.parse(result);
-			console.log(data);
-			if(data.getUser.length > 0){
-				localStorage.setItem("o-id", data.getUser[0].id);
+			if(data.loginUser.length > 0){
+				localStorage.setItem("o-id", data.loginUser[0].id);
 				window.location.href = "/dashboard";
 			}else {
-				errorText.innerHTML = "Email Does Not Exist";
+				errorText.innerHTML = "Email Or Password is Incorrect";
 				errorText.style.color = 'red';
 				errorText.style.display = 'block';
 				loginBtn.value = "Login"

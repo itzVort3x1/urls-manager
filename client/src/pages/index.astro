@@ -13,11 +13,13 @@ import '../styles/global.css';
 	<body>
 		<div class="w-screen h-screen bg-gray-300 relative">
 			<div id="center-div" class="absolute text-center">
-				<h1 class="text-xl py-3" >Welcome to Urls</h1>
+				<h1 class="text-xl py-3 text-2xl font-bold" >Welcome to Urls</h1>
 				<input autocomplete="off" type="email" value="" id="email-input" class="p-3 rounded bg-transparent  border-b-1 border-black focus:outline-none" placeholder="Email"/>
-				<input type="submit" class="rounded" value="Login" id="login-btn"/>
+				<input autocomplete="off" type="password" value="" id="pass-input" class="p-3 my-3 rounded bg-transparent  border-b-1 border-black focus:outline-none" placeholder="Password"/>
 				<br>
 				<span id="error-text" class="hidden">Invalid Email</span>
+				<input type="submit" class="rounded" value="Login" id="login-btn"/>
+				<br>
 				<h1 class="py-3">Don't Have an account? <a href="/signin" class="text-blue-500">Sign In</a></h1>
 			</div>
 		</div>

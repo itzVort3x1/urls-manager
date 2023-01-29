@@ -22,7 +22,6 @@ input[type="email"]{
      background: white;
 }
 input[type="submit"]{
-     margin-left: -85px;
      height: 2.5rem;
      width: 5rem;
      border: 0;

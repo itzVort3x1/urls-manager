@@ -9,6 +9,47 @@ const errTxt = document.getElementById('error-text');
 var myHeaders = new Headers();
 myHeaders.append("Content-Type", "application/json");
 var totalUsers;
+var existingUsers;
+
+function debounce(callback, wait) {
+     let timeout;
+     return (...args) => {
+         clearTimeout(timeout);
+         timeout = setTimeout(function () { callback.apply(this, args); }, wait);
+     };
+   }
+   
+
+emailInput.addEventListener('keyup', debounce(() => {
+     var graphql = JSON.stringify({
+          query: `
+          query getUser($email: String!){
+               getUser(email: $email){
+                 email
+               }
+             }
+          `,
+          variables: {
+               email: emailInput.value
+          }
+     });
+     
+     var requestOptionsTotal = {
+          method: 'POST',
+          headers: myHeaders,
+          body: graphql,
+          redirect: 'follow'
+     };
+     
+     fetch("https://oslash-clone.kaustubh10.workers.dev", requestOptionsTotal)
+          .then(res => res.text())
+          .then(result => {
+               const { data } = JSON.parse(result);
+               console.log(data);
+               existingUsers = data.getUser;
+          })
+          .catch(err => console.log('error', error));
+}, 1000))
 
 var graphql = JSON.stringify({
      query: `
@@ -29,6 +70,7 @@ fetch("https://oslash-clone.kaustubh10.workers.dev", requestOptionsTotal)
      .then(res => res.text())
      .then(result => {
           const { data } = JSON.parse(result);
+          console.log(data);
           totalUsers = data.totalUsers;
      })
      .catch(err => console.log('error', error));
@@ -57,6 +99,24 @@ document.getElementById('sign-btn').addEventListener('click', async () => {
      signBtn.value = 'Loading...';
      signBtn.disabled = true;
 
+     if(nameInput.value == "" || emailInput.value == "" || orgInput.value == "" || passInput.value == "" || cpassInput.value == ""){
+          errTxt.innerHTML = 'Please Fill All The Fields'
+          errTxt.style.color = 'red';
+		errTxt.style.display = 'block';
+		signBtn.value = "Sign Up";
+		clearErrTextTimeout();
+          return
+     }
+
+     if(existingUsers.length > 0){
+          errTxt.innerHTML = 'Email Already Exists'
+          errTxt.style.color = 'red';
+		errTxt.style.display = 'block';
+		signBtn.value = "Sign Up";
+		clearErrTextTimeout();
+          return
+     }
+
      if(!validateEmail(emailInput.value)){
 		errTxt.style.color = 'red';
 		errTxt.style.display = 'block';
@@ -71,6 +131,7 @@ document.getElementById('sign-btn').addEventListener('click', async () => {
 		errTxt.style.display = 'block';
 		signBtn.value = "Sign Up";
 		clearErrTextTimeout();
+          return;
      }
 
      if(cpassInput.value.toLowerCase() !== passInput.value.toLowerCase()){
@@ -79,6 +140,7 @@ document.getElementById('sign-btn').addEventListener('click', async () => {
 		errTxt.style.display = 'block';
 		signBtn.value = "Sign Up";
 		clearErrTextTimeout();
+          return;
      }
 
      var graphql = JSON.stringify({
