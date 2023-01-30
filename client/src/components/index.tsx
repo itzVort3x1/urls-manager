@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useState, useRef, MutableRefObject } from 'react';
-import { Redirect, Router } from 'react-router';
+import { Redirect } from 'react-router';
 import SearchBarIsland from './SearchBar';
 import '../styles/global.css';
 
