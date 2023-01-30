@@ -1,11 +1,17 @@
 import React from 'preact';
 import { useState, useEffect, useRef } from 'preact/hooks';
-import ShortCutIsland from './ShortcutAdder.tsx';
-import DisplayIsland from './Display.tsx';
+import ShortCutIsland from './ShortcutAdder';
+import DisplayIsland from './Display';
 
 interface snippetprops{
 	url: string
 	snippet: string
+}
+
+interface requestProps {
+	method: string,
+	headers: Headers,
+	body: string
 }
 
 const ShortcutIsland = () => {
@@ -14,7 +20,7 @@ const ShortcutIsland = () => {
 
 	const [snippets, SetSnippets] = useState<snippetprops[]>();
 	const [searchString, setSearchString] = useState<string>("o/");
-	const searchInput = useRef();
+	const searchInput = useRef(null);
 
 	function addNewVal(val: snippetprops){
 		var graphql = JSON.stringify({
@@ -35,11 +41,10 @@ const ShortcutIsland = () => {
 			}
 		});
 
-		var requestOptions = {
+		var requestOptions: requestProps = {
 			method: 'POST',
 			headers: myHeaders,
-			body: graphql,
-			redirect: 'follow'
+			body: graphql
 		};
 
 		fetch("https://oslash-clone.kaustubh10.workers.dev", requestOptions)
@@ -48,7 +53,7 @@ const ShortcutIsland = () => {
 				fetchSnippets();
 				location.reload();
 			})
-			.catch(err => console.log('error', error));
+			.catch(err => console.log('error', err));
 	}
 
 	function fetchSnippets(){
@@ -66,11 +71,10 @@ const ShortcutIsland = () => {
 			}
 		});
 
-		var requestOptions = {
+		var requestOptions: requestProps = {
 			method: 'POST',
 			headers: myHeaders,
 			body: graphql,
-			redirect: 'follow'
 		};
 
 		fetch("https://oslash-clone.kaustubh10.workers.dev", requestOptions)
@@ -79,7 +83,7 @@ const ShortcutIsland = () => {
 				const { data } = JSON.parse(result);
 				SetSnippets(data.userShortcuts);
 			})
-			.catch(err => console.log('error', error));
+			.catch(err => console.log('error', err));
 	}
 
 	useEffect(() => {
@@ -94,14 +98,14 @@ const ShortcutIsland = () => {
 
      return (
 		<>
-			<div class="w-11/12 mx-auto h-28 my-3 rounded-lg bg-gray-500">
-				<h1 class="px-3 font-bold text-xl py-2 text-white">Search</h1>
-				<input type="text" value={searchString} id="searchInput"  ref={searchInput}  class="w-96 py-1 px-2 rounded focus:outline-none bg-gray-200 mx-3 mt-2 mb-0" placeholder="Search.."/>
+			<div className="w-11/12 mx-auto h-28 my-3 rounded-lg bg-gray-500">
+				<h1 className="px-3 font-bold text-xl py-2 text-white">Search</h1>
+				<input type="text" value={searchString} id="searchInput"  ref={searchInput}  className="w-96 py-1 px-2 rounded focus:outline-none bg-gray-200 mx-3 mt-2 mb-0" placeholder="Search.."/>
 				<br />
-				<span class="px-3 text-sm text-gray-200">Search for you shortcut here..</span>
+				<span className="px-3 text-sm text-gray-200">Search for you shortcut here..</span>
 			</div>
 			<ShortCutIsland callback={addNewVal}/>
-			<DisplayIsland dataProp={snippets} searchString={searchString} callback={fetchSnippets}/>
+			<DisplayIsland dataProp={snippets} searchString={searchString}/>
 		</>
      );
 };

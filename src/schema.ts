@@ -1,6 +1,6 @@
 import { makeExecutableSchema } from '@graphql-tools/schema'
 import { connect } from '@planetscale/database'
-import { typeDefinitions } from './types/typeDefinitions.ts'
+import { typeDefinitions } from './types/typeDefinitions'
 
 const config = {
     host: 'us-east.connect.psdb.cloud',
@@ -14,7 +14,7 @@ const resolvers = {
     Query: {
       info: () => 'This is the API of a Hackernews clone',
       totalUsers: async () => {
-        const [results] = await Promise.all([conn.execute('select count(*) as total from users')]);
+        const [results]: any = await Promise.all([conn.execute('select count(*) as total from users')]);
         return parseInt(results.rows[0].total);
       },
       users: async () => {
@@ -25,19 +25,20 @@ const resolvers = {
         const [results] = await Promise.all([conn.execute('select * from shortcuts')]);
         return results.rows;
       },
-      getUser: async (parent, args) => {
+      getUser: async (parent: unknown, args: {email: string, id: number}) => {
         const [results] = await Promise.all([conn.execute(`select * from users where email = "${args?.email}" or id = ${args?.id == undefined ? null : args.id}`)]);
         return results.rows;
       },
-      userShortcuts: async(parent, args) => {
+      userShortcuts: async(parent: unknown, args: {user_id: number}) => {
         const [results] = await Promise.all([conn.execute(`select * from shortcuts where user_id = ${args?.user_id == undefined ? null : args.user_id}`)]);
         return results.rows;
       },
-      getShortcut: async(parent, args) => {
-        const [results] = await Promise.all([conn.execute(`select * from shortcuts where snippet like "${args?.snippet}%" and user_id = ${args.user_id} limit 10`)]);
+      getShortcut: async(parent: unknown, args: {snippet: string, user_id: number}) => {
+        console.log(args.snippet);
+        const [results] = await Promise.all([conn.execute(`select * from shortcuts where snippet like "%${args?.snippet.split('/')[1]}%" and user_id = ${args.user_id} limit 10`)]);
         return results.rows;
       },
-      loginUser: async (parent, args) => {
+      loginUser: async (parent: unknown, args: {email: string, password: string}) => {
         const [results] = await Promise.all([conn.execute(`select * from users where email = "${args.email}" and password = "${args.password}"`)]);
         return results.rows;
       }

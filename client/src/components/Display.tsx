@@ -1,6 +1,12 @@
 import { h } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
-import ShortCutIsland from './ShortcutAdder.tsx';
+import ShortCutIsland from './ShortcutAdder';
+
+interface requestProps {
+	method: string,
+	headers: Headers,
+	body: string
+}
 
 const ShortcutIsland = ({ dataProp, searchString }) => {
 
@@ -25,11 +31,10 @@ const ShortcutIsland = ({ dataProp, searchString }) => {
 			}
 		});
 
-		var requestOptions = {
+		var requestOptions: requestProps = {
 			method: 'POST',
 			headers: myHeaders,
-			body: graphql,
-			redirect: 'follow'
+			body: graphql
 		};
 
 		fetch("https://oslash-clone.kaustubh10.workers.dev", requestOptions)
@@ -39,7 +44,7 @@ const ShortcutIsland = ({ dataProp, searchString }) => {
 				console.log(data);
 				setSnippets(data.getShortcut);
 			})
-			.catch(err => console.log('error', error));
+			.catch(err => console.log('error', err));
 	}
 
      function deleteSnippet(user_id: number, snippet: string){
@@ -57,11 +62,10 @@ const ShortcutIsland = ({ dataProp, searchString }) => {
 			}
 		});
 
-		var requestOptions = {
+		var requestOptions: requestProps = {
 			method: 'POST',
 			headers: myHeaders,
-			body: graphql,
-			redirect: 'follow'
+			body: graphql
 		};
 
 		fetch("https://oslash-clone.kaustubh10.workers.dev", requestOptions)
@@ -70,7 +74,7 @@ const ShortcutIsland = ({ dataProp, searchString }) => {
 				const { data } = JSON.parse(result);
                     fetchSearchingSnippet("o/");
 			})
-			.catch(err => console.log('error', error));
+			.catch(err => console.log('error', err));
      }
 
      useEffect(() => {
@@ -79,31 +83,31 @@ const ShortcutIsland = ({ dataProp, searchString }) => {
 
      return (
 		<>
-			<div class="w-11/12 mx-auto h-96 my-7 rounded-lg bg-gray-500">
-                    <div class="flex">
-                         <div class="font-bold flex-auto w-1/4 text-start p-3">
-                              <span class="">Shortcut</span>
+			<div className="w-11/12 mx-auto h-96 my-7 rounded-lg bg-gray-500">
+                    <div className="flex">
+                         <div className="font-bold flex-auto w-1/4 text-start p-3">
+                              <span className="">Shortcut</span>
                          </div>
-                         <div class="font-bold flex-auto w-3/4 p-3">
-                              <span class="px-2">URL</span>
+                         <div className="font-bold flex-auto w-3/4 p-3">
+                              <span className="px-2">URL</span>
                          </div>
                     </div>
-                    <div class="max-h-80 overflow-auto overflow-x-hidden">
-                    {snippets?.length == 0 && <div class='text-center my-24 font-fold text-lg'>You have no snippets <br /> Create Shortcuts</div>}
+                    <div className="max-h-80 overflow-auto overflow-x-hidden">
+                    {snippets?.length == 0 && <div className='text-center my-24 font-fold text-lg'>You have no snippets <br /> Create Shortcuts</div>}
                     {snippets?.length > 0 && snippets.map((item, index) => {
                          return (
-                              <div class="flex">
-                                   <div class="font-bold flex-auto w-1/4 text-start p-3">
-                                        <div class="bg-gray-400 p-2 rounded">{ item.snippet }</div>
+                              <div className="flex">
+                                   <div className="font-bold flex-auto w-1/4 text-start p-3">
+                                        <div className="bg-gray-400 p-2 rounded">{ item.snippet }</div>
                                    </div>
-                                   <div class="font-bold flex-auto w-2/4 p-3">
-                                        <div class="bg-gray-400 p-2 rounded">{ item.url }</div>
+                                   <div className="font-bold flex-auto w-2/4 p-3">
+                                        <div className="bg-gray-400 p-2 rounded">{ item.url }</div>
                                    </div>
-                                   <div class="font-bold flex-auto w-1/4 p-3">
-                                        <button class="bg-teal-400 mx-2 py-2 px-3 rounded drop-shadow" onClick={() => {
+                                   <div className="font-bold flex-auto w-1/4 p-3">
+                                        <button className="bg-teal-400 mx-2 py-2 px-3 rounded drop-shadow" onClick={() => {
                                              window.open(item.url, "_blank")
                                         }}>Open</button>
-                                        <button class="bg-rose-600 mx-2 py-2 px-3 rounded drop-shadow" onClick={() => {
+                                        <button className="bg-rose-600 mx-2 py-2 px-3 rounded drop-shadow" onClick={() => {
                                              deleteSnippet(parseInt(localStorage.getItem("o-id")), item.snippet)
                                         }}>Delete</button>
                                    </div>
