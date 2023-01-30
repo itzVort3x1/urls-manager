@@ -1,0 +1,19 @@
+---
+import '../styles/global.css';
+const { title } = Astro.props;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <div class="w-screen h-screen bg-gray-300 relative">
+        <div id="center-div" class="absolute text-center">
+            <h1 class='py-3 text-2xl font-bold'>{title}</h1>
+            <slot />
+        </div>
+    </div>
+  </body>
+</html>

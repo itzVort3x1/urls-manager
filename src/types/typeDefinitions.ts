@@ -1,6 +1,5 @@
 export const typeDefinitions = `
   type Query {
-    info: String!
     users: [User!]!
     getUser(email: String, id: ID): [User!]
     loginUser(email: String!, password: String!): [User!]

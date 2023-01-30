@@ -12,7 +12,6 @@ const conn = connect(config);
 
 const resolvers = {
     Query: {
-      info: () => 'This is the API of a Hackernews clone',
       totalUsers: async () => {
         const [results]: any = await Promise.all([conn.execute('select count(*) as total from users')]);
         return parseInt(results.rows[0].total);

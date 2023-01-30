@@ -1,5 +1,4 @@
-import { h } from 'preact';
-import { useState, useEffect } from 'preact/hooks';
+import React, { useState, useEffect } from 'react';
 import ShortCutIsland from './ShortcutAdder';
 
 interface requestProps {
@@ -8,15 +7,20 @@ interface requestProps {
 	body: string
 }
 
-const ShortcutIsland = ({ dataProp, searchString }) => {
+interface snippetprops{
+	url: string
+	snippet: string
+}
+
+const ShortcutIsland = ({ dataProp, searchString }: {dataProp: snippetprops[], searchString: string}) => {
 
      const [snippets, setSnippets] = useState(dataProp);
 
-     var myHeaders = new Headers();
+     const myHeaders = new Headers();
 	myHeaders.append("Content-Type", "application/json");
 
      function fetchSearchingSnippet(searchString: string){
-		var graphql = JSON.stringify({
+		const graphql = JSON.stringify({
 			query: `
 			query getShortcut($snippet: String, $user_id: ID){
 				getShortcut(snippet: $snippet, user_id: $user_id){
@@ -32,7 +36,7 @@ const ShortcutIsland = ({ dataProp, searchString }) => {
 			}
 		});
 
-		var requestOptions: requestProps = {
+		const requestOptions: requestProps = {
 			method: 'POST',
 			headers: myHeaders,
 			body: graphql
@@ -49,7 +53,7 @@ const ShortcutIsland = ({ dataProp, searchString }) => {
 	}
 
      function deleteSnippet(user_id: number, snippet: string){
-             var graphql = JSON.stringify({
+             const graphql = JSON.stringify({
 			query: `
 			mutation deleteShortcut($snippet: String!, $user_id: ID!){
                     deleteShortcut(snippet: $snippet, user_id: $user_id){
@@ -63,7 +67,7 @@ const ShortcutIsland = ({ dataProp, searchString }) => {
 			}
 		});
 
-		var requestOptions: requestProps = {
+		const requestOptions: requestProps = {
 			method: 'POST',
 			headers: myHeaders,
 			body: graphql
@@ -79,7 +83,7 @@ const ShortcutIsland = ({ dataProp, searchString }) => {
      }
 
      useEffect(() => {
-          fetchSearchingSnippet(searchString);
+		fetchSearchingSnippet(searchString);
 	}, [searchString]);
 
      return (
@@ -97,7 +101,7 @@ const ShortcutIsland = ({ dataProp, searchString }) => {
                     {snippets?.length == 0 && <div className='text-center my-24 font-fold text-lg'>You have no snippets <br /> Create Shortcuts</div>}
                     {snippets?.length > 0 && snippets.map((item, index) => {
                          return (
-                              <div className="flex">
+                              <div key={index} className="flex">
                                    <div className="font-bold flex-auto w-1/4 text-start p-3">
                                         <div className="bg-gray-400 p-2 rounded">{ item.snippet }</div>
                                    </div>
