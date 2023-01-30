@@ -58,16 +58,29 @@ const resolvers = {
     
           return user
         },
-        createShortcut: async(parent: unknown, args: {user_id: number, snippet: string, url: string}) => {
+        createShortcut: async(parent: unknown, args: {user_id: number, snippet: string, url: string, id: string}) => {
           const shortcut = {
             user_id: args.user_id,
             snippet: args.snippet,
-            url: args.url
+            url: args.url,
+            id: args.id
           }
 
-          const query = 'INSERT INTO shortcuts (`user_id`, `snippet`, `url`) VALUES (?, ?, ?)'
-          const params = [args.user_id, args.snippet, args.url];
+          const query = 'INSERT INTO shortcuts (`user_id`, `snippet`, `url`, `id`) VALUES (?, ?, ?, ?)'
+          const params = [args.user_id, args.snippet, args.url, args.id];
           await conn.execute(query, params);
+
+          return shortcut
+        },
+        updateShortcut: async (parent: unknown, args: {snippet: string, url: string, id: string }) => {
+          const shortcut = {
+            snippet: args.snippet,
+            url: args.url,
+            id: args.id
+          } 
+          console.log(args.id);
+          const query = `UPDATE shortcuts SET snippet = "${args.snippet}", url= "${args.url}" WHERE id = "${args.id}"`
+          await conn.execute(query);
 
           return shortcut
         },

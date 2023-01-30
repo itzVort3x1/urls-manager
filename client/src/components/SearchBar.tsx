@@ -22,13 +22,21 @@ const ShortcutIsland = () => {
 	const [searchString, setSearchString] = useState<string>("o/");
 	const searchInput = useRef(null);
 
+	function uuid() {
+		return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+			var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+			return v.toString(16);
+		});
+	}
+
 	function addNewVal(val: snippetprops){
 		var graphql = JSON.stringify({
 			query: `
-			mutation createShortcut($user_id: ID!, $snippet: String!, $url: String!){
+			mutation createShortcut($user_id: ID!, $snippet: String!, $url: String!, $id: String!){
 				createShortcut(user_id: $user_id, 
 					snippet: $snippet,
-				  url: $url
+				  url: $url,
+				  id: $id
 				){
 				  user_id
 				}
@@ -37,7 +45,8 @@ const ShortcutIsland = () => {
 			variables: {
 				user_id: parseInt(localStorage.getItem("o-id")),
 				snippet: val.snippet,
-				url: val.url
+				url: val.url,
+				id: uuid()
 			}
 		});
 
@@ -63,6 +72,7 @@ const ShortcutIsland = () => {
 				userShortcuts(user_id: $user_id){
 					snippet
 					url
+					id
 				}
 			}
 			`,

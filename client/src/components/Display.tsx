@@ -22,6 +22,7 @@ const ShortcutIsland = ({ dataProp, searchString }) => {
 				getShortcut(snippet: $snippet, user_id: $user_id){
 				  snippet
 				  url
+				  id
 				}
 			   }
 			`,

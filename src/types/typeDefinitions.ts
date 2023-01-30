@@ -15,7 +15,11 @@ export const typeDefinitions = `
   }
 
   type Mutation {
-    createShortcut(user_id: ID!, snippet: String!, url: String!): Shortcut!
+    createShortcut(user_id: ID!, snippet: String!, url: String!, id: String!): Shortcut!
+  }
+
+  type Mutation {
+    updateShortcut(snippet: String!, url: String!, id: String!): Shortcut!
   }
 
   type Mutation {
@@ -26,6 +30,7 @@ export const typeDefinitions = `
     user_id: ID!
     snippet: String!
     url: String!
+    id: String!
   }
 
   type User {
