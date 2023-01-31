@@ -203,18 +203,55 @@ const isSignUpUser = rule({ cache: "contextual" })(
 	}
 );
 
+
+function isValidURL(str: string): boolean {
+	if(/^(http(s):\/\/.)[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/g.test(str)) {
+		return true;
+	} else {
+		return false;
+	}
+ }
+   
+
 const isValidShortcut = rule({ cache: "contextual" })(
 	async (parent, args, ctx, info) => {
-		if(args.url == "" || args.snippet == "o/"){
-			return createGraphQLError('Please Enter all the Fields');
+		if(args.snippet == "o/"){
+			return createGraphQLError('Please Fill the Snippet field');
 		}
+		if(args.url == ""){
+			return createGraphQLError('Please Fill the url field');
+		}
+		if(!isValidURL(args.url)){
+			return createGraphQLError('Please Enter a Valid URL');
+		}
+		return true;
+	}
+);
+
+const isValidRequest = rule({ cache: "contextual" })(
+	async (parent, args, ctx, info) => {
+		// console.log(">>>>>", ctx.request.headers.get("authorization"))
+		// const token = ctx.request.headers.get("authorization");
+		// if(token !== "thisIsAuth"){
+		// 	return createGraphQLError('Unauthorized Access');
+		// }
+		// if(args.snippet == "o/"){
+		// 	return createGraphQLError('Please Fill the Snippet field');
+		// }
+		// if(args.url == ""){
+		// 	return createGraphQLError('Please Fill the url field');
+		// }
+		// if(!isValidURL(args.url)){
+		// 	return createGraphQLError('Please Enter a Valid URL');
+		// }
 		return true;
 	}
 );
 
 const permissions = shield({
 	Query: {
-		loginUser: isLoginValidation
+		loginUser: isLoginValidation,
+		// userShortcuts: isValidRequest
 	},
 	Mutation: {
 		createUser: isSignUpUser,

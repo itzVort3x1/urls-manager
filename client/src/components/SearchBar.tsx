@@ -22,6 +22,7 @@ const ShortcutIsland = () => {
 	const searchInput = useRef(null);
 
 	function fetchSnippets(){
+		// myHeaders.append("authorization", "thisIsuth");
 		const graphql = JSON.stringify({
 			query: `
 			query userShortcuts($user_id: ID!){
