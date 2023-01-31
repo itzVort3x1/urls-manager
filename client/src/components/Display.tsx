@@ -92,6 +92,10 @@ const ShortcutIsland = ({
 	}
 
 	useEffect(() => {
+		setSnippets(dataProp);
+	}, [dataProp]);
+
+	useEffect(() => {
 		fetchSearchingSnippet(searchString);
 	}, [searchString]);
 
@@ -112,8 +116,8 @@ const ShortcutIsland = ({
 							You have no snippets <br /> Create Shortcuts
 						</div>
 					)}
-					{dataProp?.length > 0 &&
-						dataProp.map((item, index) => {
+					{snippets?.length > 0 &&
+						snippets.map((item, index) => {
 							return (
 								<div key={index} className="flex">
 									<div className="font-bold flex-auto w-1/4 text-start p-3">

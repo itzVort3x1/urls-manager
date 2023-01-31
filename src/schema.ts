@@ -82,14 +82,16 @@ const resolvers = {
 				email: args.email,
 				password: args.password,
 			};
-			// const accessToken = jwt.sign(user, "mySecretKey");
-			// console.log(accessToken);
-			// const [results] = await Promise.all([
-			// 	conn.execute(
-			// 		`select * from users where email = "${args.email}" and password = "${args.password}"`
-			// 	),
-			// ]);
-			// return results.rows;
+
+			const [results] = await Promise.all([
+				conn.execute(
+					`select * from users where email = "${args.email}" and password = "${args.password}"`
+				),
+			]);
+			if(!results.rows.length){
+				return createGraphQLError("Invalid Credentials");
+			}
+			return results.rows;
 		},
 	},
 	Mutation: {
@@ -171,20 +173,53 @@ const resolvers = {
 	},
 };
 
-const isAuthenticated = rule({ cache: "contextual" })(
+function validateEmail(mail: string): boolean {
+	if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail)) {
+		return true;
+	}
+	return false;
+}
+
+const isLoginValidation = rule({ cache: "contextual" })(
 	async (parent, args, ctx, info) => {
-		console.log(">>>>", ctx.request.get("authorization"));
-		// return !ctx.headers["authorization"];
-		// return true;
-		return false;
+		if(!validateEmail(args.email)){
+			return createGraphQLError('Invalid Email')
+		}
+
+		return true;
+	}
+);
+
+const isSignUpUser = rule({ cache: "contextual" })(
+	async (parent, args, ctx, info) => {
+		console.log(args);
+		if(args.email == "" || args.name == "" || args.password == "" || args.Org_name == ""){
+			return createGraphQLError('Please Enter all the Fields');
+		}
+		if(!validateEmail(args.email)){
+			return createGraphQLError('Invalid Email')
+		}
+		return true;
+	}
+);
+
+const isValidShortcut = rule({ cache: "contextual" })(
+	async (parent, args, ctx, info) => {
+		if(args.url == "" || args.snippet == "o/"){
+			return createGraphQLError('Please Enter all the Fields');
+		}
+		return true;
 	}
 );
 
 const permissions = shield({
 	Query: {
-		getUser: isAuthenticated,
+		loginUser: isLoginValidation
 	},
-	Mutation: {},
+	Mutation: {
+		createUser: isSignUpUser,
+		createShortcut: isValidShortcut
+	},
 });
 
 const schema = makeExecutableSchema({

@@ -21,8 +21,6 @@ const ShortcutIsland = () => {
 	const [searchString, setSearchString] = useState<string>("o/");
 	const searchInput = useRef(null);
 
-	
-
 	function fetchSnippets(){
 		const graphql = JSON.stringify({
 			query: `

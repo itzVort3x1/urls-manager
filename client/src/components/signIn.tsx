@@ -12,6 +12,10 @@ interface requestProps {
 	body: string;
 }
 
+interface userProps {
+    email: string
+}
+
 const SignInIsland = () => {
 	const existingId: string = localStorage.getItem("o-id");
 	if (existingId) {
@@ -26,17 +30,10 @@ const SignInIsland = () => {
 	const [org, setOrg] = useState<string>("");
 	const [password, setPassword] = useState<string>("");
 	const [cpassword, setCpassword] = useState<string>("");
+    const [totalUsers, setTotalUsers] = useState<number>();
+    const [existingUsers, setExistingUsers] = useState<userProps[]>();
 	const signBtn: MutableRefObject<HTMLInputElement> = useRef();
 	const errTxt: MutableRefObject<HTMLHeadingElement> = useRef();
-
-	let totalUsers: number, existingUsers: [{ email: string }];
-
-	const validateEmail: (mail: string) => boolean = (mail) => {
-		if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail)) {
-			return true;
-		}
-		return false;
-	};
 
 	const clearErrTextTimeout: () => void = () => {
 		const id = setTimeout(() => {
@@ -65,7 +62,7 @@ const SignInIsland = () => {
 			.then((res) => res.text())
 			.then((result) => {
 				const { data } = JSON.parse(result);
-				totalUsers = data.totalUsers;
+                setTotalUsers(data.totalUsers)
 			})
 			.catch((err) => console.log("error", err));
 	}, []);
@@ -97,9 +94,8 @@ const SignInIsland = () => {
 					return res.text();
 				})
 				.then((result) => {
-					const { data, errors } = JSON.parse(result);
-					console.log(errors);
-					existingUsers = data.getUser;
+					const { data } = JSON.parse(result);
+					setExistingUsers(data.getUser);
 				})
 				.catch((err) => console.log("error", err));
 		}, 1000);
@@ -109,44 +105,21 @@ const SignInIsland = () => {
 	function signInUser(
 		name: string,
 		email: string,
-		orgVal,
+		orgVal: string,
 		pass: string,
 		cpass: string
 	) {
 		// signBtn.current.innerHTML = 'Loading...';
 		//  signBtn.current.disabled = true;
 
-		if (
-			name == "" ||
-			email == "" ||
-			orgVal == "" ||
-			pass == "" ||
-			cpass == ""
-		) {
-			errTxt.current.innerHTML = "Please Fill All The Fields";
-			errTxt.current.style.color = "red";
-			errTxt.current.style.display = "block";
-			// signBtn.current.value = "Sign Up";
-			clearErrTextTimeout();
-			return;
-		}
-
-		if (existingUsers.length > 0) {
-			errTxt.current.innerHTML = "Email Already Exists";
+        if(existingUsers.length > 0) {
+            errTxt.current.innerHTML = "Email Already Exists";
 			errTxt.current.style.color = "red";
 			errTxt.current.style.display = "block";
 			signBtn.current.value = "Sign Up";
 			clearErrTextTimeout();
 			return;
-		}
-
-		if (!validateEmail(email)) {
-			errTxt.current.style.color = "red";
-			errTxt.current.style.display = "block";
-			signBtn.current.value = "Sign Up";
-			clearErrTextTimeout();
-			return;
-		}
+        }
 
 		if (cpass.length < 6) {
 			errTxt.current.innerHTML = "Password should be greater than 6 characters";
@@ -165,6 +138,8 @@ const SignInIsland = () => {
 			clearErrTextTimeout();
 			return;
 		}
+
+        console.log(">>>>",totalUsers)
 
 		const graphql = JSON.stringify({
 			query: `
@@ -199,7 +174,15 @@ const SignInIsland = () => {
 		fetch("https://oslash-clone.kaustubh10.workers.dev", requestOptions)
 			.then((res) => res.text())
 			.then((result) => {
-				const { data } = JSON.parse(result);
+				const { data, errors } = JSON.parse(result);
+                if(errors){
+                    errTxt.current.innerHTML = errors[0].message;
+					errTxt.current.style.color = "red";
+					errTxt.current.style.display = "block";
+					signBtn.current.value = "Sing Up";
+                    clearErrTextTimeout();
+                    return;
+                }
 				localStorage.setItem("o-id", data.createUser.id);
 				window.location.href = "/dashboard";
 			})

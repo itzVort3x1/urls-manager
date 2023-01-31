@@ -25,13 +25,6 @@ const DashboardIsland = () => {
 	const loginBtn: MutableRefObject<HTMLInputElement> = useRef();
 	const errTxt: MutableRefObject<HTMLHeadingElement> = useRef();
 
-	function validateEmail(mail: string): boolean {
-		if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail)) {
-			return true;
-		}
-		return false;
-	}
-
 	const clearErrTextTimeout = () => {
 		const id = setTimeout(() => {
 			errTxt.current.style.color = "red";
@@ -43,14 +36,6 @@ const DashboardIsland = () => {
 	function loginUser(email: string, password: string): void {
 		loginBtn.current.value = "Loading...";
 		loginBtn.current.disabled = true;
-
-		if (!validateEmail(email)) {
-			errTxt.current.style.color = "red";
-			errTxt.current.style.display = "block";
-			loginBtn.current.value = "Login";
-			clearErrTextTimeout();
-			return;
-		}
 
 		const graphql = JSON.stringify({
 			query: `
@@ -75,16 +60,18 @@ const DashboardIsland = () => {
 		fetch("https://oslash-clone.kaustubh10.workers.dev", requestOptions)
 			.then((res) => res.text())
 			.then((result) => {
-				const { data } = JSON.parse(result);
-				if (data.loginUser.length > 0) {
-					localStorage.setItem("o-id", data.loginUser[0].id);
-					window.location.href = "/dashboard";
-				} else {
-					errTxt.current.innerHTML = "Email Or Password is Incorrect";
+				const { data, errors } = JSON.parse(result);
+                if(errors){
+                    errTxt.current.innerHTML = errors[0].message;
 					errTxt.current.style.color = "red";
 					errTxt.current.style.display = "block";
 					loginBtn.current.value = "Login";
-					clearErrTextTimeout();
+                    clearErrTextTimeout();
+                    return;
+                }
+				if (data.loginUser?.length > 0) {
+					localStorage.setItem("o-id", data.loginUser[0].id);
+					window.location.href = "/dashboard";
 				}
 			})
 			.catch((err) => console.log("error", err));

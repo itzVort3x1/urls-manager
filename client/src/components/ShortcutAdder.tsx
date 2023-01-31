@@ -1,4 +1,4 @@
-import React, {ChangeEvent, useRef, useState} from 'react';
+import React, {ChangeEvent, MutableRefObject, useRef, useState} from 'react';
 
 interface snippetprops{
 	url: string
@@ -18,6 +18,15 @@ const ShortcutIsland = ({callback}: {callback: () => void}) => {
 
 	 const [snippet, setSnippet] = useState<string>('o/');
 	 const [url, setUrl] = useState<string>('');
+	 const errTxt: MutableRefObject<HTMLSpanElement> = useRef(null);
+
+	 const clearErrTextTimeout = () => {
+		const id = setTimeout(() => {
+			errTxt.current.style.color = "red";
+			errTxt.current.innerHTML = "";
+		}, 3000);
+	};
+
 
 	 function uuid(): string {
 		return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c: string): string {
@@ -56,13 +65,22 @@ const ShortcutIsland = ({callback}: {callback: () => void}) => {
 		fetch("https://oslash-clone.kaustubh10.workers.dev", requestOptions)
 			.then(res => res.text())
 			.then(result => {
+				const {data, errors} = JSON.parse(result);
+				if(errors){
+					errTxt.current.innerHTML = 'Please Enter All The Fields';
+					errTxt.current.style.color = 'red';
+					clearErrTextTimeout();
+                    return;
+				}
+				setSnippet("o/");
+				setUrl("");
 				callback();
 			})
 			.catch(err => console.log('error', err));
 	}
 
      return (
-          <div className="w-11/12 mx-auto h-40 my-6 rounded-lg bg-gray-500">
+          <div className="w-11/12 mx-auto h-48 my-6 rounded-lg bg-gray-500">
 			<h1 className="px-3 font-bold text-xl py-2 text-white">Add Your New Shortcut</h1>
 			<div className="flex">
 				<div className="font-bold flex-auto w-1/3 text-start p-3">
@@ -88,6 +106,9 @@ const ShortcutIsland = ({callback}: {callback: () => void}) => {
 						addNewVal({ snippet: snippet, url: url })
 					}}>Add</button>
 				</div>
+			</div>
+			<div className='text-center'>
+				<span className='font-bold' ref={errTxt}></span>
 			</div>
 		</div>
      );
