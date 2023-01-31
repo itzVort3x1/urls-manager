@@ -1,3 +1,4 @@
 name = "oslash-clone"
 main = "src/index.ts"
 compatibility_date = "2023-01-27"
+node_compat = true

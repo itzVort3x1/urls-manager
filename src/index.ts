@@ -1,11 +1,11 @@
-import { connect } from '@planetscale/database'
-import { createYoga, createSchema } from 'graphql-yoga'
-import { schema } from './schema'
+import { connect } from "@planetscale/database";
+import { createYoga, createSchema } from "graphql-yoga";
+import { schemaWithPermissions } from "./schema";
 
 const yoga = createYoga({
-	graphqlEndpoint: '/',
-	schema: schema
-})
+	graphqlEndpoint: "/",
+	schema: schemaWithPermissions,
+});
 
 // const worker = {
 // 	async fetch(request: Request): Promise<Response> {
@@ -14,7 +14,7 @@ const yoga = createYoga({
 // 			username: 'v8pv86gq25zylt6jz29t',
 // 			password: 'pscale_pw_uODyreQj8yl8IGUlxLyjYf8zaVvBZ1PE0GoDVH0SeUg'
 // 		}
-		
+
 // 		const conn = connect(config);
 // 		const [results] = await Promise.all([conn.execute('select * from users')]);
 // 		console.log(results.rows);
@@ -25,13 +25,13 @@ const yoga = createYoga({
 // 				"Access-Control-Allow-Origin": "*"
 // 			}
 // 		})
-		
+
 // 	}
 // }
 
 // export default worker;
-	   
-self.addEventListener('fetch', yoga)
+
+self.addEventListener("fetch", yoga);
 
 // database: usersb
 // username: v8pv86gq25zylt6jz29t
