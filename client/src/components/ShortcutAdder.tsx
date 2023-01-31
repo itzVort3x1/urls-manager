@@ -67,7 +67,7 @@ const ShortcutIsland = ({callback}: {callback: () => void}) => {
 			.then(result => {
 				const {data, errors} = JSON.parse(result);
 				if(errors){
-					errTxt.current.innerHTML = 'Please Enter All The Fields';
+					errTxt.current.innerHTML = errors[0].message;
 					errTxt.current.style.color = 'red';
 					clearErrTextTimeout();
                     return;
