@@ -221,9 +221,9 @@ const isValidShortcut = rule({ cache: "contextual" })(
 		if(args.url == ""){
 			return createGraphQLError('Please Fill the url field');
 		}
-		if(!isValidURL(args.url)){
-			return createGraphQLError('Please Enter a Valid URL');
-		}
+		// if(!isValidURL(args.url)){
+		// 	return createGraphQLError('Please Enter a Valid URL');
+		// }
 		return true;
 	}
 );
