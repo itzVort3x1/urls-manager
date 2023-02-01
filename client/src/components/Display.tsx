@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ShortCutIsland from "./ShortcutAdder";
+import { useStore } from "@nanostores/react";
+import { searchString } from "../context/store";
 
 interface requestProps {
 	method: string;
@@ -12,18 +14,11 @@ interface snippetprops {
 	snippet: string;
 }
 
-const ShortcutIsland = ({
-	dataProp,
-	searchString,
-}: {
-	dataProp: snippetprops[];
-	searchString: string;
-}) => {
-	console.log("state changed", dataProp);
-
+const ShortcutIsland = ({ dataProp }: { dataProp: snippetprops[] }) => {
 	const [snippets, setSnippets] = useState(dataProp);
+	const $searchString = useStore<any>(searchString);
 
-	console.log("snippets", snippets);
+	console.log("stores search string", $searchString);
 
 	const myHeaders = new Headers();
 	myHeaders.append("Content-Type", "application/json");
@@ -96,8 +91,8 @@ const ShortcutIsland = ({
 	}, [dataProp]);
 
 	useEffect(() => {
-		fetchSearchingSnippet(searchString);
-	}, [searchString]);
+		fetchSearchingSnippet($searchString);
+	}, [$searchString]);
 
 	return (
 		<>
