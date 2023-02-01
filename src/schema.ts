@@ -3,8 +3,10 @@ import { connect } from "@planetscale/database";
 import { typeDefinitions } from "./types/typeDefinitions";
 import { createGraphQLError } from "graphql-yoga";
 import { applyMiddleware } from "graphql-middleware";
-import { shield, rule } from "graphql-shield";
-// import jwt from "jsonwebtoken";
+import { shield, rule, and } from "graphql-shield";
+import { APP_SECRET } from './auth'
+import { compare, hash } from 'bcryptjs'
+import jwt from '@tsndr/cloudflare-worker-jwt'
 
 const config = {
 	host: "us-east.connect.psdb.cloud",
@@ -83,15 +85,25 @@ const resolvers = {
 				password: args.password,
 			};
 
+			const password = await hash(args.password, 10)
+
 			const [results] = await Promise.all([
 				conn.execute(
-					`select * from users where email = "${args.email}" and password = "${args.password}"`
+					`select * from users where email = "${args.email}"`
 				),
 			]);
 			if(!results.rows.length){
 				return createGraphQLError("Invalid Credentials");
 			}
-			return results.rows;
+			const userPass: any = results.rows[0];
+			const valid = await compare(args.password, userPass.password)
+			if (!valid) {
+				return createGraphQLError('Invalid password')
+			}
+			
+
+			const token = await jwt.sign({ user: userPass.id }, APP_SECRET)
+			return {token, user};
 		},
 	},
 	Mutation: {
@@ -112,18 +124,21 @@ const resolvers = {
 				Org_name: args.Org_name,
 			};
 
+			const password = await hash(args.password, 10)
+
 			const query =
 				"INSERT INTO users (`id`, `name`, `email`, `password`, `Org_name`) VALUES (?, ?, ?, ?, ?)";
 			const params = [
 				args.id,
-				args.name,
+				args.name,	
 				args.email,
-				args.password,
+				password,
 				args.Org_name,
 			];
 			await conn.execute(query, params);
+			const token: string = await jwt.sign({ user: user.id }, APP_SECRET);
 
-			return user;
+			return {token, user};
 		},
 		createShortcut: async (
 			parent: unknown,
@@ -228,23 +243,23 @@ const isValidShortcut = rule({ cache: "contextual" })(
 	}
 );
 
-const isValidRequest = rule({ cache: "contextual" })(
+const authenticateUser = rule({ cache: "contextual" })(
 	async (parent, args, ctx, info) => {
-		// console.log(">>>>>", ctx.request.headers.get("authorization"))
-		// const token = ctx.request.headers.get("authorization");
-		// if(token !== "thisIsAuth"){
-		// 	return createGraphQLError('Unauthorized Access');
+		const header = ctx.request.headers.get('Authorization');
+		if (header !== null) {
+			// 1
+			const token = header.split(' ')[1]
+			// 2
+			console.log(token);
+			const isValid = jwt.verify(token, APP_SECRET)
+			if(!isValid){
+				return createGraphQLError('Unauthenticated user');
+			}
+			return true;
+		}
+ 
+  		return createGraphQLError('Unauthenticated Users');
 		// }
-		// if(args.snippet == "o/"){
-		// 	return createGraphQLError('Please Fill the Snippet field');
-		// }
-		// if(args.url == ""){
-		// 	return createGraphQLError('Please Fill the url field');
-		// }
-		// if(!isValidURL(args.url)){
-		// 	return createGraphQLError('Please Enter a Valid URL');
-		// }
-		return true;
 	}
 );
 
@@ -255,7 +270,7 @@ const permissions = shield({
 	},
 	Mutation: {
 		createUser: isSignUpUser,
-		createShortcut: isValidShortcut
+		createShortcut: and(authenticateUser, isValidShortcut)
 	},
 });
 

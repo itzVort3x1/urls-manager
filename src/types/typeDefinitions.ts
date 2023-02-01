@@ -2,7 +2,7 @@ export const typeDefinitions = `
   type Query {
     users: [User!]!
     getUser(email: String, id: ID): [User!]
-    loginUser(email: String!, password: String!): [User!]
+    loginUser(email: String!, password: String!): AuthPayload!
     allShortcuts: [Shortcut!]!
     totalUsers: Int
     userShortcuts(user_id: ID!): [Shortcut!]!
@@ -10,7 +10,7 @@ export const typeDefinitions = `
   }
 
   type Mutation {
-    createUser(name: String!, email: String!, Org_name: String!, password: String!, id: ID!): User!
+    createUser(name: String!, email: String!, Org_name: String!, password: String!, id: ID!): AuthPayload!
   }
 
   type Mutation {
@@ -23,6 +23,11 @@ export const typeDefinitions = `
 
   type Mutation {
     deleteShortcut(snippet: String!, user_id: ID!): Shortcut!
+  }
+
+  type AuthPayload {
+    token: String!
+    user: User
   }
 
   type Shortcut {
