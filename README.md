@@ -1,4 +1,4 @@
-# oslash-clone
+# urls-manager
 ```
 Technologies Used
 ```
