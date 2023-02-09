@@ -1,4 +1,7 @@
 # urls-manager
+
+Hosted At: https://60c15abc.urls-bzh.pages.dev/
+
 ```
 Technologies Used
 ```
